@@ -1,0 +1,183 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "name": "Demo_EmotioNet for Arousal Prediction.ipynb",
+      "provenance": [],
+      "toc_visible": true,
+      "authorship_tag": "ABX9TyP1Q6bJqeawbXrIpti0m+R7",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/NibrasAz7/Emotion_ECL_VIP/blob/main/Demo_EmotioNet_for_Arousal_Prediction\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "txXuNkqnCKiO",
+        "outputId": "0ed357dd-e1b7-4747-88a1-b7ca8dfcea09"
+      },
+      "source": [
+        "pip install moabb"
+      ],
+      "execution_count": 4,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "Requirement already satisfied: moabb in /usr/local/lib/python3.7/dist-packages (0.3.0)\n",
+            "Requirement already satisfied: patool<2.0,>=1.12 in /usr/local/lib/python3.7/dist-packages (from moabb) (1.12)\n",
+            "Requirement already satisfied: mne>=0.19 in /usr/local/lib/python3.7/dist-packages (from moabb) (0.23.0)\n",
+            "Requirement already satisfied: PyYAML<6.0.0,>=5.0.0 in /usr/local/lib/python3.7/dist-packages (from moabb) (5.4.1)\n",
+            "Requirement already satisfied: h5py<4.0.0,>=3.0.0 in /usr/local/lib/python3.7/dist-packages (from moabb) (3.1.0)\n",
+            "Requirement already satisfied: pandas<2.0.0,>=1.0.0 in /usr/local/lib/python3.7/dist-packages (from moabb) (1.1.5)\n",
+            "Requirement already satisfied: scipy<2.0,>=1.5 in /usr/local/lib/python3.7/dist-packages (from moabb) (1.6.3)\n",
+            "Requirement already satisfied: scikit-learn<0.24,>=0.23 in /usr/local/lib/python3.7/dist-packages (from moabb) (0.23.2)\n",
+            "Requirement already satisfied: pyunpack<0.3.0,>=0.2.2 in /usr/local/lib/python3.7/dist-packages (from moabb) (0.2.2)\n",
+            "Requirement already satisfied: wfdb<4.0.0,>=3.3.0 in /usr/local/lib/python3.7/dist-packages (from moabb) (3.4.0)\n",
+            "Requirement already satisfied: seaborn>=0.9.0 in /usr/local/lib/python3.7/dist-packages (from moabb) (0.11.1)\n",
+            "Requirement already satisfied: numpy<2.0.0,>=1.19.0 in /usr/local/lib/python3.7/dist-packages (from moabb) (1.19.5)\n",
+            "Requirement already satisfied: matplotlib<4.0.0,>=3.0.0 in /usr/local/lib/python3.7/dist-packages (from moabb) (3.2.2)\n",
+            "Requirement already satisfied: pyriemann>=0.2.6 in /usr/local/lib/python3.7/dist-packages (from moabb) (0.2.6)\n",
+            "Requirement already satisfied: cached-property; python_version < \"3.8\" in /usr/local/lib/python3.7/dist-packages (from h5py<4.0.0,>=3.0.0->moabb) (1.5.2)\n",
+            "Requirement already satisfied: python-dateutil>=2.7.3 in /usr/local/lib/python3.7/dist-packages (from pandas<2.0.0,>=1.0.0->moabb) (2.8.1)\n",
+            "Requirement already satisfied: pytz>=2017.2 in /usr/local/lib/python3.7/dist-packages (from pandas<2.0.0,>=1.0.0->moabb) (2018.9)\n",
+            "Requirement already satisfied: threadpoolctl>=2.0.0 in /usr/local/lib/python3.7/dist-packages (from scikit-learn<0.24,>=0.23->moabb) (2.1.0)\n",
+            "Requirement already satisfied: joblib>=0.11 in /usr/local/lib/python3.7/dist-packages (from scikit-learn<0.24,>=0.23->moabb) (1.0.1)\n",
+            "Requirement already satisfied: easyprocess in /usr/local/lib/python3.7/dist-packages (from pyunpack<0.3.0,>=0.2.2->moabb) (0.3)\n",
+            "Requirement already satisfied: entrypoint2 in /usr/local/lib/python3.7/dist-packages (from pyunpack<0.3.0,>=0.2.2->moabb) (0.2.4)\n",
+            "Requirement already satisfied: chardet>=3.0.0 in /usr/local/lib/python3.7/dist-packages (from wfdb<4.0.0,>=3.3.0->moabb) (3.0.4)\n",
+            "Requirement already satisfied: requests>=2.8.1 in /usr/local/lib/python3.7/dist-packages (from wfdb<4.0.0,>=3.3.0->moabb) (2.23.0)\n",
+            "Requirement already satisfied: certifi>=2016.8.2 in /usr/local/lib/python3.7/dist-packages (from wfdb<4.0.0,>=3.3.0->moabb) (2020.12.5)\n",
+            "Requirement already satisfied: pyparsing>=2.0.4 in /usr/local/lib/python3.7/dist-packages (from wfdb<4.0.0,>=3.3.0->moabb) (2.4.7)\n",
+            "Requirement already satisfied: urllib3>=1.22 in /usr/local/lib/python3.7/dist-packages (from wfdb<4.0.0,>=3.3.0->moabb) (1.24.3)\n",
+            "Requirement already satisfied: kiwisolver>=1.1.0 in /usr/local/lib/python3.7/dist-packages (from wfdb<4.0.0,>=3.3.0->moabb) (1.3.1)\n",
+            "Requirement already satisfied: idna>=2.2 in /usr/local/lib/python3.7/dist-packages (from wfdb<4.0.0,>=3.3.0->moabb) (2.10)\n",
+            "Requirement already satisfied: cycler>=0.10.0 in /usr/local/lib/python3.7/dist-packages (from wfdb<4.0.0,>=3.3.0->moabb) (0.10.0)\n",
+            "Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.7/dist-packages (from python-dateutil>=2.7.3->pandas<2.0.0,>=1.0.0->moabb) (1.15.0)\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 129
+        },
+        "id": "eNdhlsCgCVog",
+        "outputId": "0898876a-08cf-4eb1-c783-16e5e662169f"
+      },
+      "source": [
+        "type python --version"
+      ],
+      "execution_count": 7,
+      "outputs": [
+        {
+          "output_type": "error",
+          "ename": "SyntaxError",
+          "evalue": "ignored",
+          "traceback": [
+            "\u001b[0;36m  File \u001b[0;32m\"<ipython-input-7-d15da1478b57>\"\u001b[0;36m, line \u001b[0;32m1\u001b[0m\n\u001b[0;31m    type python --version\u001b[0m\n\u001b[0m              ^\u001b[0m\n\u001b[0;31mSyntaxError\u001b[0m\u001b[0;31m:\u001b[0m invalid syntax\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "022ohifIBl88"
+      },
+      "source": [
+        "**1. Load Data**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 333
+        },
+        "id": "4RbAgGZvBc91",
+        "outputId": "767cc7fc-13df-4ca7-a9ad-fb52f3f6c03f"
+      },
+      "source": [
+        "import numpy as np\n",
+        "from Library.signal_target import SignalAndTarget\n",
+        "import scipy.io as sio"
+      ],
+      "execution_count": 1,
+      "outputs": [
+        {
+          "output_type": "error",
+          "ename": "ModuleNotFoundError",
+          "evalue": "ignored",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mModuleNotFoundError\u001b[0m                       Traceback (most recent call last)",
+            "\u001b[0;32m<ipython-input-1-457a417d04ac>\u001b[0m in \u001b[0;36m<module>\u001b[0;34m()\u001b[0m\n\u001b[1;32m      1\u001b[0m \u001b[0;32mimport\u001b[0m \u001b[0mnumpy\u001b[0m \u001b[0;32mas\u001b[0m \u001b[0mnp\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 2\u001b[0;31m \u001b[0;32mfrom\u001b[0m \u001b[0mLibrary\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0msignal_target\u001b[0m \u001b[0;32mimport\u001b[0m \u001b[0mSignalAndTarget\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      3\u001b[0m \u001b[0;32mimport\u001b[0m \u001b[0mscipy\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mio\u001b[0m \u001b[0;32mas\u001b[0m \u001b[0msio\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;31mModuleNotFoundError\u001b[0m: No module named 'Library'",
+            "",
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0;32m\nNOTE: If your import is failing due to a missing package, you can\nmanually install dependencies using either !pip or !apt.\n\nTo view examples of installing some common dependencies, click the\n\"Open Examples\" button below.\n\u001b[0;31m---------------------------------------------------------------------------\u001b[0m\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "M83BC685BwLv"
+      },
+      "source": [
+        "# Dataset\n",
+        "train_dict = sio.loadmat(r'/data/yiwang/DEAP_10_iterations_3D/Train_data_and_labels_3d.mat')\n",
+        "test_dict = sio.loadmat(r'/data/yiwang/DEAP_10_iterations_3D/Test_data_and_labels_3d.mat')\n",
+        "\n",
+        "# Load Arousal Data&Label for training and testing\n",
+        "train_arousal_data = train_dict['train_arousal_data_balanced_3d']\n",
+        "train_arousal_label = train_dict['train_arousal_label_balanced']\n",
+        "test_arousal_data = test_dict['test_arousal_data_3d']\n",
+        "test_arousal_label = test_dict['test_arousal_label']\n",
+        "\n",
+        "# Type\n",
+        "train_arousal_data = train_arousal_data.astype(np.float32)\n",
+        "train_arousal_label = train_arousal_label.astype(np.int64)\n",
+        "test_arousal_data = test_arousal_data.astype(np.float32)\n",
+        "test_arousal_label = test_arousal_label.astype(np.int64)\n",
+        "\n",
+        "# Shape\n",
+        "train_arousal_label.shape = (train_arousal_label.shape[0],)\n",
+        "test_arousal_label.shape = (test_arousal_label.shape[0],)\n",
+        "\n",
+        "# Form train and test set\n",
+        "train_set = SignalAndTarget(train_arousal_data, y=train_arousal_label)    \n",
+        "test_set = SignalAndTarget(test_arousal_data, y=test_arousal_label)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
